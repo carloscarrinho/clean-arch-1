@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "test:staged": "jest --passWithNoTests"
+    "test:staged": "jest --passWithNoTests",
+    "lint:staged": "lint-staged"
   },
   "devDependencies": {
     "@types/jest": "^27.4.0",
