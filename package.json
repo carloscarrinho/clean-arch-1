@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
+    "test:watch": "jest --watch --coverage=false",
     "test:staged": "jest --passWithNoTests",
     "lint:staged": "lint-staged"
   },
