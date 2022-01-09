@@ -21,6 +21,17 @@ const makeSut = (): SutTypes => {
   return { sut, emailValidatorStub }
 }
 
+// ### ALTERNATIVA DE MOCK DO SYSTEM UNDER TEST ###
+const makeSut2 = ({ isValid }: {
+  isValid?: Function
+}): SignUpController => {
+  const emailValidatorStub = ({
+    isValid
+  } as unknown) as EmailValidator
+
+  return new SignUpController(emailValidatorStub)
+}
+
 describe('SignUp Controller', () => {
   it('Should return 400 if no name is provided', async () => {
     // Given
@@ -120,5 +131,31 @@ describe('SignUp Controller', () => {
     // Then
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new InvalidParamError('email'))
+  })
+
+  it('Should call EmailValidator with e-mail provided by request', async () => {
+    // Given
+    // ### mock ensinado pelo Manguinho ###
+    // const { sut, emailValidatorStub } = makeSut()
+    // const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
+
+    // ### alternativa utilizando o outro mock do System Under Test ###
+    const isValidSpy = jest.fn()
+    const sut = makeSut2({ isValid: isValidSpy })
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'invalid_email@mail.com',
+        password: 'password',
+        passwordConfirmation: 'password'
+      }
+    }
+
+    // When
+    sut.handle(httpRequest)
+
+    // Then
+    expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email)
   })
 })
