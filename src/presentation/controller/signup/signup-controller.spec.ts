@@ -259,4 +259,34 @@ describe('SignUp Controller', () => {
       password: httpRequest.body.password
     })
   })
+
+  it('Should return 500 when AddAccount throws an exception', async () => {
+    // Given
+    // sugestão do Manguinho para mock do método 'isValid' do addAccountStub:
+    const { sut, addAccountStub } = makeSut()
+    jest.spyOn(addAccountStub, 'add').mockImplementationOnce(() => { throw new Error() })
+
+    // alternativa sem utilizar o Jest:
+    // const dependencies = {
+    //   isValid: () => true,
+    //   add: () => { throw new Error() }
+    // }
+    // const sut = makeSut2(dependencies)
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@mail.com',
+        password: 'password',
+        passwordConfirmation: 'password'
+      }
+    }
+
+    // When
+    const httpResponse = sut.handle(httpRequest)
+
+    // Then
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
 })
