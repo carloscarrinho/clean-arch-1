@@ -5,8 +5,11 @@
   "license": "MIT",
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watch --coverage=false",
-    "test:staged": "jest --passWithNoTests",
+    "test:unit:watch": "jest --silent --watch --coverage=false -c jest-unit-config.js",
+    "test:integration:watch": "jest --silent --watch --coverage=false --runInBand -c jest-integration-config.js",
+    "test:verbose": "npm test -- --verbose",
+    "test:staged": "npm test -- --passWithNoTests --coverage=false --silent --findRelatedTests",
+    "test:ci": "npm test -- --coverage",
     "lint:staged": "lint-staged"
   },
   "devDependencies": {
