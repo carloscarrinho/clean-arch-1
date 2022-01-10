@@ -15,13 +15,15 @@ const makeEmailValidator = (): EmailValidator => {
 
 const makeAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
-    add (account: AddAccountModel): AccountModel {
-      return {
+    async add (account: AddAccountModel): Promise<AccountModel> {
+      const fakeAccount = {
         id: 'valid_id',
         name: 'valid_name',
         email: 'valid_email@mail.com',
         password: 'valid_password'
       }
+
+      return await new Promise(resolve => resolve(fakeAccount))
     }
   }
   return new AddAccountStub()
@@ -68,7 +70,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(400)
@@ -87,7 +89,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(400)
@@ -106,7 +108,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(400)
@@ -125,7 +127,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(400)
@@ -145,7 +147,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(400)
@@ -169,7 +171,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(400)
@@ -196,7 +198,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    sut.handle(httpRequest)
+    await sut.handle(httpRequest)
 
     // Then
     expect(isValidSpy).toHaveBeenCalledWith(httpRequest.body.email)
@@ -220,7 +222,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(500)
@@ -250,7 +252,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    sut.handle(httpRequest)
+    await sut.handle(httpRequest)
 
     // Then
     expect(addSpy).toHaveBeenCalledWith({
@@ -283,7 +285,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(500)
@@ -305,7 +307,7 @@ describe('SignUp Controller', () => {
     }
 
     // When
-    const httpResponse = sut.handle(httpRequest)
+    const httpResponse = await sut.handle(httpRequest)
 
     // Then
     expect(httpResponse.statusCode).toBe(200)
