@@ -2,21 +2,25 @@ import { InvalidParamError, MissingParamError, ServerError } from '../errors'
 import { EmailValidator } from '../protocols'
 import { SignUpController } from './signup-controller'
 
+// ### SUGESTÃO DO MANGUINHO PARA MOCK DO SYSTEM UNDER TEST ###
 interface SutTypes {
   sut: SignUpController
   emailValidatorStub: EmailValidator
 }
 
-const makeSut = (): SutTypes => {
+const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
     isValid (email: string): boolean {
       return true
     }
   }
 
-  const emailValidatorStub = new EmailValidatorStub()
-  const sut = new SignUpController(emailValidatorStub)
+  return new EmailValidatorStub()
+}
 
+const makeSut = (): SutTypes => {
+  const emailValidatorStub = makeEmailValidator()
+  const sut = new SignUpController(emailValidatorStub)
   return { sut, emailValidatorStub }
 }
 
@@ -161,7 +165,7 @@ describe('SignUp Controller', () => {
   it('Should return 500 when EmailValidator throws an exception', async () => {
     // Given
     const { sut, emailValidatorStub } = makeSut()
-    // alternativas para mockar o emailValidatorStub:
+    // alternativa para mockar o emailValidatorStub:
     emailValidatorStub.isValid = () => { throw new Error() }
 
     const httpRequest = {
