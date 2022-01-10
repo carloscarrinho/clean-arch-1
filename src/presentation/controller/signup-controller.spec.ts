@@ -165,8 +165,10 @@ describe('SignUp Controller', () => {
   it('Should return 500 when EmailValidator throws an exception', async () => {
     // Given
     const { sut, emailValidatorStub } = makeSut()
-    // alternativa para mockar o emailValidatorStub:
-    emailValidatorStub.isValid = () => { throw new Error() }
+    // sugestão do Manguinho para mock do método 'isValid' do emailValidatorStub:
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => { throw new Error() })
+    // alternativa sem utilizar o Jest:
+    // emailValidatorStub.isValid = () => { throw new Error() }
 
     const httpRequest = {
       body: {
