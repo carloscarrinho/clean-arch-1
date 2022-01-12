@@ -29,8 +29,6 @@ describe('AccountMongoRepository', () => {
 
     const account = await sut.add(accountData)
 
-    console.log('account #2 >> ', account)
-
     expect(account).toBeTruthy()
     expect(account.id).toBeTruthy()
     expect(account.name).toEqual(accountData.name)
