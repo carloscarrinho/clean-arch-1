@@ -7,7 +7,7 @@ const valueToHash = 'valid_password'
 const salt = 12
 
 jest.mock('bcrypt', () => ({
-  async hash (value: string, salt: number): Promise<string> {
+  async hash (): Promise<string> {
     return await new Promise((resolve) => resolve(hashedValue))
   }
 }))
@@ -32,5 +32,17 @@ describe('Bcrypt Adapter', () => {
     const hash = await sut.encrypt(valueToHash)
 
     expect(hash).toBe(hashedValue)
+  })
+
+  it('Should throw an error if bcrypt throws', async () => {
+    bcrypt.hash = jest.fn().mockReturnValueOnce(
+      new Promise((resolve, reject) => reject(new Error()))
+    )
+
+    const sut = makeSut(salt)
+
+    const promise = sut.encrypt(valueToHash)
+
+    await expect(promise).rejects.toThrow()
   })
 })
