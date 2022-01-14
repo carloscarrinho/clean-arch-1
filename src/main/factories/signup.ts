@@ -3,10 +3,11 @@ import { DbAddAccount } from '../../data/usecases/add-account/db-add-account'
 import { BcryptAdapter } from '../../infrastructure/criptography/bcrypt-adapter'
 import { AccountMongoRepository } from '../../infrastructure/db/mongodb/account-repository/account'
 import { SignUpController } from '../../presentation/controller/signup/signup-controller'
-import { HttpRequest, HttpResponse } from '../../presentation/protocols'
+import { Controller, HttpRequest, HttpResponse } from '../../presentation/protocols'
 import { EmailValidatorAdapter } from '../../utils/email-validator-adapter'
+import { LogControllerDecorator } from '../decorators/log'
 
-const makeSignUpController = (): SignUpController => {
+const makeSignUpController = (): Controller => {
   const emailValidator = new EmailValidatorAdapter()
 
   const salt = 12
@@ -14,7 +15,9 @@ const makeSignUpController = (): SignUpController => {
   const repository = new AccountMongoRepository()
   const addAccount = new DbAddAccount(encrypter, repository)
 
-  return new SignUpController(emailValidator, addAccount)
+  const signUpController = new SignUpController(emailValidator, addAccount)
+
+  return new LogControllerDecorator(signUpController)
 }
 
 export const adaptSignUpController = async (req: Request, res: Response): Promise<Response> => {
