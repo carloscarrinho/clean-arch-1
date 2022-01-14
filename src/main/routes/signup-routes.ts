@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { Router } from 'express'
+import { adaptSignUpController } from '../factories/signup'
 
-export default (router: Router): void => {
-  router.post('/signup', (req, res) => {
-    res.json({ success: 'success' })
-  })
+export default async (router: Router): Promise<void> => {
+  router.post('/signup', adaptSignUpController)
 }
