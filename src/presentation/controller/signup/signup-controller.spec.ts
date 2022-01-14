@@ -1,6 +1,7 @@
 import { SignUpController } from './signup-controller'
-import { InvalidParamError, MissingParamError, ServerError } from '../../errors'
+import { InvalidParamError, MissingParamError } from '../../errors'
 import { EmailValidator, AddAccount, AccountModel, AddAccountModel } from './signup-protocols'
+import { internalServerError } from '../../helpers/http-helper'
 
 // ### SUGESTÃO DO MANGUINHO PARA MOCK DO SYSTEM UNDER TEST ###
 const makeEmailValidator = (): EmailValidator => {
@@ -208,7 +209,9 @@ describe('SignUp Controller', () => {
     // Given
     const { sut, emailValidatorStub } = makeSut()
     // sugestão do Manguinho para mock do método 'isValid' do emailValidatorStub:
-    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => { throw new Error() })
+    const fakeError = new Error()
+    fakeError.stack = 'any_stack'
+    jest.spyOn(emailValidatorStub, 'isValid').mockImplementationOnce(() => { throw fakeError })
     // alternativa sem utilizar o Jest:
     // emailValidatorStub.isValid = () => { throw new Error() }
 
@@ -225,8 +228,7 @@ describe('SignUp Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     // Then
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse).toEqual(internalServerError(fakeError))
   })
 
   it('Should call AddAccount with validated values', async () => {
@@ -266,7 +268,9 @@ describe('SignUp Controller', () => {
     // Given
     // sugestão do Manguinho para mock do método 'isValid' do addAccountStub:
     const { sut, addAccountStub } = makeSut()
-    jest.spyOn(addAccountStub, 'add').mockImplementationOnce(() => { throw new Error() })
+    const fakeError = new Error()
+    fakeError.stack = 'any_error'
+    jest.spyOn(addAccountStub, 'add').mockImplementationOnce(() => { throw fakeError })
 
     // alternativa sem utilizar o Jest:
     // const dependencies = {
@@ -288,8 +292,7 @@ describe('SignUp Controller', () => {
     const httpResponse = await sut.handle(httpRequest)
 
     // Then
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual(new ServerError())
+    expect(httpResponse).toEqual(internalServerError(fakeError))
   })
 
   it('Should return 200 if valid data is provided', async () => {
