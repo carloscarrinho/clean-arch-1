@@ -1,13 +1,32 @@
+import { LogErrorRepository } from '../../data/protocols/log-error-repository'
 import { SignUpController } from '../../presentation/controller/signup/signup-controller'
+import { internalServerError, success } from '../../presentation/helpers/http-helper'
 import { LogControllerDecorator } from './log'
 
 // ###### MEU MOCK ######
-const makeSut = ({ handle }: { handle?: Function}): LogControllerDecorator => {
+const makeSut = ({
+  handle,
+  log
+}: {
+  handle?: Function
+  log?: Function
+}): LogControllerDecorator => {
   const signUpController = ({
-    handle: handle ?? jest.fn()
+    handle
   } as unknown) as SignUpController
 
-  return new LogControllerDecorator(signUpController)
+  const logErrorRepository = ({
+    log: log ?? jest.fn()
+  } as unknown) as LogErrorRepository
+
+  return new LogControllerDecorator(signUpController, logErrorRepository)
+}
+
+const defaultAccount = {
+  id: 'any_id',
+  name: 'any_name',
+  email: 'any_email@mail.com',
+  password: 'any_password'
 }
 
 // ##### MANGUINHO MOCK ######
@@ -62,16 +81,11 @@ describe('LogControllerDecorator', () => {
     expect(handleSpy).toHaveBeenCalledWith(httpRequest)
   })
 
-  it('Should call handle method of controller with request', async () => {
+  it('Should return the same return of controller', async () => {
     // Given
     const expectedResult = {
       statusCode: 200,
-      body: {
-        id: 'any_id',
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password'
-      }
+      body: success(defaultAccount)
     }
     const dependencies = {
       handle: jest.fn().mockResolvedValue(expectedResult)
@@ -92,5 +106,33 @@ describe('LogControllerDecorator', () => {
 
     // Then
     expect(response).toStrictEqual(expectedResult)
+  })
+
+  it('Should call LogControllerErrorRepository with error if controller returns 500', async () => {
+    // Given
+    const fakeError = new Error()
+    fakeError.stack = 'any_error'
+
+    const dependencies = {
+      handle: jest.fn().mockResolvedValue(internalServerError(fakeError)),
+      log: jest.fn()
+    }
+
+    const sut = makeSut(dependencies)
+
+    const httpRequest = {
+      body: {
+        name: 'any_name',
+        email: 'any_email@mail.com',
+        password: 'any_password',
+        passwordConfirmation: 'any_password'
+      }
+    }
+
+    // When
+    await sut.handle(httpRequest)
+
+    // Then
+    expect(dependencies.log).toHaveBeenLastCalledWith(fakeError.stack)
   })
 })
