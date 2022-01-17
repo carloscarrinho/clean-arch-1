@@ -26,7 +26,10 @@ export const adaptSignUpController = async (req: Request, res: Response): Promis
   const controller = makeSignUpController()
   const httpRequest: HttpRequest = { body: req.body }
   const httpResponse: HttpResponse = await controller.handle(httpRequest)
-  const response = res.status(httpResponse.statusCode).json(httpResponse.body)
 
-  return await new Promise(resolve => resolve(response))
+  if (httpResponse.statusCode !== 200) {
+    return res.status(httpResponse.statusCode).json({ error: httpResponse.body.message })
+  }
+
+  return res.status(httpResponse.statusCode).json(httpResponse.body)
 }
