@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { DbAddAccount } from '../../data/usecases/add-account/db-add-account'
 import { BcryptAdapter } from '../../infrastructure/criptography/bcrypt-adapter'
 import { AccountMongoRepository } from '../../infrastructure/db/mongodb/account-repository/account'
+import { LogMongoRepository } from '../../infrastructure/db/mongodb/log-repository/log'
 import { SignUpController } from '../../presentation/controller/signup/signup-controller'
 import { Controller, HttpRequest, HttpResponse } from '../../presentation/protocols'
 import { EmailValidatorAdapter } from '../../utils/email-validator-adapter'
@@ -16,8 +17,9 @@ const makeSignUpController = (): Controller => {
   const addAccount = new DbAddAccount(encrypter, repository)
 
   const signUpController = new SignUpController(emailValidator, addAccount)
+  const logMongoRepository = new LogMongoRepository()
 
-  return new LogControllerDecorator(signUpController)
+  return new LogControllerDecorator(signUpController, logMongoRepository)
 }
 
 export const adaptSignUpController = async (req: Request, res: Response): Promise<Response> => {
