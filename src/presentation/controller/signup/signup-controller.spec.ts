@@ -1,6 +1,6 @@
 import { SignUpController } from './signup-controller'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { EmailValidator, AddAccount, AccountModel, AddAccountModel } from './signup-protocols'
+import { EmailValidator, AddAccount, AccountModel, AddAccountModel, HttpRequest } from './signup-protocols'
 import { internalServerError } from '../../helpers/http-helper'
 
 // ### SUGESTÃO DO MANGUINHO PARA MOCK DO SYSTEM UNDER TEST ###
@@ -41,6 +41,18 @@ const makeSut = (): {
   return { sut, emailValidatorStub, addAccountStub }
 }
 
+const makeFakeRequest = (data?: object): HttpRequest => {
+  return {
+    body: {
+      name: 'valid_name',
+      email: 'valid_email@mail.com',
+      password: 'valid_password',
+      passwordConfirmation: 'valid_password',
+      ...data
+    }
+  }
+}
+
 // ### ALTERNATIVA DE MOCK DO SYSTEM UNDER TEST ###
 // TODO: make method returns 'happy path' by default
 const makeSut2 = ({ isValid, add }: {
@@ -62,13 +74,7 @@ describe('SignUp Controller', () => {
   it('Should return 400 if no name is provided', async () => {
     // Given
     const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        email: 'anyemail@mail.com',
-        password: 'password',
-        passwordConfirmation: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest({ name: null })
 
     // When
     const httpResponse = await sut.handle(httpRequest)
@@ -81,13 +87,7 @@ describe('SignUp Controller', () => {
   it('Should return 400 if no email is provided', async () => {
     // Given
     const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        password: 'password',
-        passwordConfirmation: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest({ email: null })
 
     // When
     const httpResponse = await sut.handle(httpRequest)
@@ -100,13 +100,7 @@ describe('SignUp Controller', () => {
   it('Should return 400 if no password is provided', async () => {
     // Given
     const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'anyemail@mail.com',
-        passwordConfirmation: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest({ password: null })
 
     // When
     const httpResponse = await sut.handle(httpRequest)
@@ -119,13 +113,7 @@ describe('SignUp Controller', () => {
   it('Should return 400 if no password confirmation is provided', async () => {
     // Given
     const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'anyemail@mail.com',
-        password: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest({ passwordConfirmation: null })
 
     // When
     const httpResponse = await sut.handle(httpRequest)
@@ -138,14 +126,7 @@ describe('SignUp Controller', () => {
   it('Should return 400 if password confirmation fails', async () => {
     // Given
     const { sut } = makeSut()
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'anyemail@mail.com',
-        password: 'password',
-        passwordConfirmation: 'invalid_password'
-      }
-    }
+    const httpRequest = makeFakeRequest({ passwordConfirmation: 'invalid_password' })
 
     // When
     const httpResponse = await sut.handle(httpRequest)
@@ -162,14 +143,7 @@ describe('SignUp Controller', () => {
     jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
     // emailValidatorStub.isValid = () => false
 
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'invalid_email@mail.com',
-        password: 'password',
-        passwordConfirmation: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     const httpResponse = await sut.handle(httpRequest)
@@ -189,14 +163,7 @@ describe('SignUp Controller', () => {
     const isValidSpy = jest.fn()
     const sut = makeSut2({ isValid: isValidSpy })
 
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'password',
-        passwordConfirmation: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     await sut.handle(httpRequest)
@@ -215,14 +182,7 @@ describe('SignUp Controller', () => {
     // alternativa sem utilizar o Jest:
     // emailValidatorStub.isValid = () => { throw new Error() }
 
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'password',
-        passwordConfirmation: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     const httpResponse = await sut.handle(httpRequest)
@@ -244,14 +204,7 @@ describe('SignUp Controller', () => {
       add: addSpy
     })
 
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_valid_email@mail.com',
-        password: 'password',
-        passwordConfirmation: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     await sut.handle(httpRequest)
@@ -279,14 +232,7 @@ describe('SignUp Controller', () => {
     // }
     // const sut = makeSut2(dependencies)
 
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'password',
-        passwordConfirmation: 'password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     const httpResponse = await sut.handle(httpRequest)
@@ -300,14 +246,7 @@ describe('SignUp Controller', () => {
     // sugestão Manguinho:
     const { sut } = makeSut()
 
-    const httpRequest = {
-      body: {
-        name: 'valid_name',
-        email: 'valid_email@mail.com',
-        password: 'valid_password',
-        passwordConfirmation: 'valid_password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     const httpResponse = await sut.handle(httpRequest)

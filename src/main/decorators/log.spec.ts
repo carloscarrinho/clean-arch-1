@@ -1,6 +1,7 @@
 import { LogErrorRepository } from '../../data/protocols/log-error-repository'
 import { SignUpController } from '../../presentation/controller/signup/signup-controller'
 import { internalServerError, success } from '../../presentation/helpers/http-helper'
+import { HttpRequest } from '../../presentation/protocols'
 import { LogControllerDecorator } from './log'
 
 // ###### MEU MOCK ######
@@ -27,6 +28,18 @@ const defaultAccount = {
   name: 'any_name',
   email: 'any_email@mail.com',
   password: 'any_password'
+}
+
+const makeFakeRequest = (data?: object): HttpRequest => {
+  return {
+    body: {
+      name: 'valid_name',
+      email: 'valid_email@mail.com',
+      password: 'valid_password',
+      passwordConfirmation: 'valid_password',
+      ...data
+    }
+  }
 }
 
 // ##### MANGUINHO MOCK ######
@@ -65,14 +78,7 @@ describe('LogControllerDecorator', () => {
     // const { sut, controllerStub } = makeSut2()
     // const handleSpy = jest.spyOn(controllerStub, 'handle')
 
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     await sut.handle(httpRequest)
@@ -92,14 +98,7 @@ describe('LogControllerDecorator', () => {
     }
     const sut = makeSut(dependencies)
 
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     const response = await sut.handle(httpRequest)
@@ -120,14 +119,7 @@ describe('LogControllerDecorator', () => {
 
     const sut = makeSut(dependencies)
 
-    const httpRequest = {
-      body: {
-        name: 'any_name',
-        email: 'any_email@mail.com',
-        password: 'any_password',
-        passwordConfirmation: 'any_password'
-      }
-    }
+    const httpRequest = makeFakeRequest()
 
     // When
     await sut.handle(httpRequest)
