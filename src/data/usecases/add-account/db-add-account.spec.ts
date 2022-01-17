@@ -37,16 +37,19 @@ const makeSut = (): {
   return { sut, encrypterStub, dbAddAccountRepositoryStub }
 }
 
+const makeDefaultAccountData = (data?: Partial<AddAccountModel>): AddAccountModel => ({
+  name: 'valid_name',
+  email: 'valid_email',
+  password: 'valid_password',
+  ...data
+})
+
 describe('DbAddAccount Usecase', () => {
   it('Should call Encrypter with provided password', async () => {
     // Given
     const { sut, encrypterStub } = makeSut()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
-    const accountData = {
-      name: 'valid_name',
-      email: 'valid_email',
-      password: 'valid_password'
-    }
+    const accountData = makeDefaultAccountData()
 
     // When
     await sut.add(accountData)
@@ -61,11 +64,7 @@ describe('DbAddAccount Usecase', () => {
     jest.spyOn(encrypterStub, 'encrypt').mockReturnValueOnce(
       new Promise((resolve, reject) => reject(new Error()))
     )
-    const accountData = {
-      name: 'valid_name',
-      email: 'valid_email',
-      password: 'valid_password'
-    }
+    const accountData = makeDefaultAccountData()
 
     // When
     const promise = sut.add(accountData)
@@ -83,11 +82,7 @@ describe('DbAddAccount Usecase', () => {
 
     const addSpy = jest.spyOn(dbAddAccountRepositoryStub, 'add')
 
-    const accountData = {
-      name: 'valid_name',
-      email: 'valid_email',
-      password: 'valid_password'
-    }
+    const accountData = makeDefaultAccountData()
 
     // When
     await sut.add(accountData)
@@ -123,11 +118,7 @@ describe('DbAddAccount Usecase', () => {
     // Given
     const { sut } = makeSut()
 
-    const accountData = {
-      name: 'valid_name',
-      email: 'valid_email@mail.com',
-      password: 'valid_password'
-    }
+    const accountData = makeDefaultAccountData()
 
     // When
     const account = await sut.add(accountData)
