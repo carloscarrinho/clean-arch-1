@@ -28,4 +28,17 @@ describe('Login Controller', () => {
     // Then
     expect(response).toEqual(expectedResult)
   })
+
+  it('Should return 400 if no password is provided', async () => {
+    // Given
+    const sut = makeSut()
+    const request = makeFakeRequest({ password: null })
+    const expectedResult = badRequest(new MissingParamError('password'))
+
+    // When
+    const response = await sut.handle(request)
+
+    // Then
+    expect(response).toEqual(expectedResult)
+  })
 })
