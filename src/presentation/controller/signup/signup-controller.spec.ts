@@ -1,6 +1,6 @@
 import { SignUpController } from './signup-controller'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { EmailValidator, AddAccount, AccountModel, AddAccountModel, HttpRequest } from './signup-protocols'
+import { EmailValidator, AddAccount, AccountModel, AddAccountModel, HttpRequest, Validation } from './signup-protocols'
 import { internalServerError } from '../../helpers/http-helper'
 
 // ### SUGESTÃO DO MANGUINHO PARA MOCK DO SYSTEM UNDER TEST ###
@@ -12,6 +12,15 @@ const makeEmailValidator = (): EmailValidator => {
   }
 
   return new EmailValidatorStub()
+}
+
+const makeValidation = (): Validation => {
+  class ValidationStub implements Validation {
+    validate (input: any): Error {
+      return null
+    };
+  }
+  return new ValidationStub()
 }
 
 const makeAddAccount = (): AddAccount => {
@@ -36,8 +45,9 @@ const makeSut = (): {
   addAccountStub: AddAccount
 } => {
   const emailValidatorStub = makeEmailValidator()
+  const validationStub = makeValidation()
   const addAccountStub = makeAddAccount()
-  const sut = new SignUpController(emailValidatorStub, addAccountStub)
+  const sut = new SignUpController(emailValidatorStub, validationStub, addAccountStub)
   return { sut, emailValidatorStub, addAccountStub }
 }
 
@@ -55,19 +65,28 @@ const makeFakeRequest = (data?: object): HttpRequest => {
 
 // ### ALTERNATIVA DE MOCK DO SYSTEM UNDER TEST ###
 // TODO: make method returns 'happy path' by default
-const makeSut2 = ({ isValid, add }: {
+const makeSut2 = ({
+  isValid,
+  add,
+  validate
+}: {
   isValid?: Function
   add?: Function
+  validate?: Function
 }): SignUpController => {
   const emailValidatorStub = ({
-    isValid
+    isValid: isValid ?? jest.fn().mockReturnValueOnce(true)
   } as unknown) as EmailValidator
 
   const addAccountStub = ({
     add
   } as unknown) as AddAccount
 
-  return new SignUpController(emailValidatorStub, addAccountStub)
+  const validation = ({
+    validate: validate ?? jest.fn().mockResolvedValueOnce(null)
+  } as unknown) as Validation
+
+  return new SignUpController(emailValidatorStub, validation, addAccountStub)
 }
 
 describe('SignUp Controller', () => {
@@ -259,5 +278,27 @@ describe('SignUp Controller', () => {
       email: httpRequest.body.email,
       password: httpRequest.body.password
     })
+  })
+
+  it('Should call AddAccount with validated values', async () => {
+    // Given
+    // ### mock ensinado pelo Manguinho ###
+    // const { sut, addAccountStub } = makeSut()
+    // const addSpy = jest.spyOn(addAccountStub, 'add')
+
+    // ### alternativa utilizando o outro mock do System Under Test ###
+    const validateSpy = jest.fn()
+    const sut = makeSut2({
+      isValid: () => true,
+      validate: validateSpy
+    })
+
+    const httpRequest = makeFakeRequest()
+
+    // When
+    await sut.handle(httpRequest)
+
+    // Then
+    expect(validateSpy).toHaveBeenCalledWith(httpRequest.body)
   })
 })
