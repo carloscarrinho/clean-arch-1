@@ -1,5 +1,5 @@
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, success } from '../../helpers/http-helper'
+import { badRequest, internalServerError, success } from '../../helpers/http-helper'
 import { Controller, HttpRequest, HttpResponse } from '../../protocols'
 import { EmailValidator } from '../signup/signup-protocols'
 
@@ -15,11 +15,13 @@ export class LoginController implements Controller {
       }
     }
 
-    const { email } = req.body
-    const isValid = this.emailValidator.isValid(email)
-
-    if (!isValid) return badRequest(new InvalidParamError('email'))
-
-    return success(null)
+    try {
+      const { email } = req.body
+      const isValid = this.emailValidator.isValid(email)
+      if (!isValid) return badRequest(new InvalidParamError('email'))
+      return success(null)
+    } catch (error) {
+      return internalServerError(error)
+    }
   }
 }
