@@ -133,7 +133,7 @@ describe('Login Controller', () => {
     expect(response).toEqual(unauthorized())
   })
 
-  it.skip('Should return 200 if Authentication returns an access token', async () => {
+  it('Should return 200 if Authentication returns an access token', async () => {
     // Given
     const sut = makeSut({})
     const request = makeFakeRequest()
