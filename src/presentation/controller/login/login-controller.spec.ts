@@ -144,4 +144,19 @@ describe('Login Controller', () => {
     // Then
     expect(response).toEqual(success('access_token'))
   })
+
+  it('Should return 500 if Authentication throws an error', async () => {
+    // Given
+    const fakeError = new Error()
+    fakeError.stack = 'any_stack'
+    const dependencies = { auth: jest.fn().mockImplementationOnce(() => { throw fakeError }) }
+    const sut = makeSut(dependencies)
+    const request = makeFakeRequest()
+
+    // When
+    const response = await sut.handle(request)
+
+    // Then
+    expect(response).toEqual(internalServerError(fakeError))
+  })
 })
