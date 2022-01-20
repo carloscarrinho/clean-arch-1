@@ -1,3 +1,4 @@
+import { Authentication } from '../../../domain/usecases/authentication'
 import { InvalidParamError, MissingParamError } from '../../errors'
 import { badRequest, internalServerError } from '../../helpers/http-helper'
 import { HttpRequest } from '../../protocols'
@@ -5,15 +6,21 @@ import { EmailValidator } from '../signup/signup-protocols'
 import { LoginController } from './login-controller'
 
 const makeSut = ({
-  isValid
+  isValid,
+  auth
 }: {
   isValid?: Function
+  auth?: Function
 }): LoginController => {
   const emailValidator = ({
     isValid: isValid ?? jest.fn().mockReturnValue(true)
   } as unknown) as EmailValidator
 
-  return new LoginController(emailValidator)
+  const authentication = ({
+    auth: auth ?? jest.fn().mockResolvedValueOnce('access_token')
+  } as unknown) as Authentication
+
+  return new LoginController(emailValidator, authentication)
 }
 
 const makeFakeRequest = (data?: object): HttpRequest => ({
@@ -92,5 +99,23 @@ describe('Login Controller', () => {
 
     // Then
     expect(response).toEqual(internalServerError(fakeError))
+  })
+
+  it('Should call Authentication with provided credentials', async () => {
+    // Given
+    const dependencies = {
+      auth: jest.fn()
+    }
+    const sut = makeSut(dependencies)
+    const request = makeFakeRequest()
+
+    // When
+    await sut.handle(request)
+
+    // Then
+    expect(dependencies.auth).toHaveBeenCalledWith(
+      request.body.email,
+      request.body.password
+    )
   })
 })
