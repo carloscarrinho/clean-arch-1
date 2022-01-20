@@ -1,6 +1,6 @@
 import { Authentication } from '../../../domain/usecases/authentication'
 import { InvalidParamError, MissingParamError } from '../../errors'
-import { badRequest, internalServerError } from '../../helpers/http-helper'
+import { badRequest, internalServerError, success, unauthorized } from '../../helpers/http-helper'
 import { HttpRequest } from '../../protocols'
 import { EmailValidator } from '../signup/signup-protocols'
 import { LoginController } from './login-controller'
@@ -117,5 +117,31 @@ describe('Login Controller', () => {
       request.body.email,
       request.body.password
     )
+  })
+
+  it('Should return 401 if invalid credentials are provided', async () => {
+    // Given
+    const sut = makeSut({
+      auth: jest.fn().mockReturnValueOnce(null)
+    })
+    const request = makeFakeRequest()
+
+    // When
+    const response = await sut.handle(request)
+
+    // Then
+    expect(response).toEqual(unauthorized())
+  })
+
+  it.skip('Should return 200 if Authentication returns an access token', async () => {
+    // Given
+    const sut = makeSut({})
+    const request = makeFakeRequest()
+
+    // When
+    const response = await sut.handle(request)
+
+    // Then
+    expect(response).toEqual(success('access_token'))
   })
 })
