@@ -134,6 +134,18 @@ describe('SignUpValidation Factory', () => {
       // Then
       expect(error).toEqual(expectedResult)
     })
+
+    it('Should return undefined if password and passwordConfirmation fields match', async () => {
+      // Given
+      const sut = new CompareFieldsValidation('password', 'passwordConfirmation')
+      const request = makeFakeRequest()
+
+      // When
+      const error = sut.validate(request.body)
+
+      // Then
+      expect(error).toBeUndefined()
+    })
   })
 
   describe('EmailValidation', () => {
