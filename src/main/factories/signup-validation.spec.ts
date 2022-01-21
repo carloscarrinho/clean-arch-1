@@ -177,5 +177,20 @@ describe('SignUpValidation Factory', () => {
       // Then
       expect(sut.validate).toThrow()
     })
+
+    it('Should return undefined if e-mail is valid', async () => {
+      // Given
+      const emailValidatorStub = makeEmailValidator()
+      emailValidatorStub.isValid = jest.fn().mockReturnValueOnce(true)
+
+      const sut = new EmailValidation('email', emailValidatorStub)
+      const request = makeFakeRequest()
+
+      // When
+      const error = sut.validate(request.body)
+
+      // Then
+      expect(error).toBeUndefined()
+    })
   })
 })
