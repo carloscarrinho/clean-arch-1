@@ -166,5 +166,16 @@ describe('SignUpValidation Factory', () => {
       // Then
       expect(error).toEqual(new InvalidParamError('email'))
     })
+
+    it('Should throw an error if EmailValidator throws', async () => {
+      // Given
+      const emailValidatorStub = makeEmailValidator()
+      emailValidatorStub.isValid = jest.fn().mockImplementation(() => { throw new Error() })
+
+      const sut = new EmailValidation('email', emailValidatorStub)
+
+      // Then
+      expect(sut.validate).toThrow()
+    })
   })
 })
