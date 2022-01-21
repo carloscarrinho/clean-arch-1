@@ -6,8 +6,8 @@
   "scripts": {
     "start": "sucrase-node src/main/server.ts",
     "test": "jest",
-    "test:unit:watch": "jest --silent --watch --coverage=false -c jest-unit-config.js",
-    "test:integration:watch": "jest --silent --watch --coverage=false --runInBand -c jest-integration-config.js",
+    "test:unit:watch": "jest --watch --coverage=false -c jest-unit-config.js",
+    "test:integration:watch": "jest --watch --coverage=false --runInBand -c jest-integration-config.js",
     "test:verbose": "npm test -- --verbose",
     "test:staged": "npm test -- --passWithNoTests --coverage=false --silent --findRelatedTests",
     "test:ci": "npm test -- --coverage",
