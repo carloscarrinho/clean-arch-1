@@ -57,67 +57,19 @@ describe('SignUpValidation Factory', () => {
   })
 
   describe('RequiredFieldsValidation', () => {
-    it('Should return missing param error if no name is provided', async () => {
+    it('Should return missing param error if required field is provided', async () => {
       // Given
-      const sut = createRequiredFieldsValidationInstance('name')
+      const sut = createRequiredFieldsValidationInstance('field')
       const request = makeFakeRequest()
-      delete request.body.name
-
-      const expectedResult = new MissingParamError('name')
 
       // When
       const error = sut.validate(request.body)
 
       // Then
-      expect(error).toEqual(expectedResult)
+      expect(error).toEqual(new MissingParamError('field'))
     })
 
-    it('Should return missing param error if no email is provided', async () => {
-      // Given
-      const sut = createRequiredFieldsValidationInstance('email')
-      const request = makeFakeRequest()
-      delete request.body.email
-
-      const expectedResult = new MissingParamError('email')
-
-      // When
-      const error = sut.validate(request.body)
-
-      // Then
-      expect(error).toEqual(expectedResult)
-    })
-
-    it('Should return missing param error if no password is provided', async () => {
-      // Given
-      const sut = createRequiredFieldsValidationInstance('password')
-      const request = makeFakeRequest()
-      delete request.body.password
-
-      const expectedResult = new MissingParamError('password')
-
-      // When
-      const error = sut.validate(request.body)
-
-      // Then
-      expect(error).toEqual(expectedResult)
-    })
-
-    it('Should return missing param error if no passwordConfirmation is provided', async () => {
-      // Given
-      const sut = createRequiredFieldsValidationInstance('passwordConfirmation')
-      const request = makeFakeRequest()
-      delete request.body.passwordConfirmation
-
-      const expectedResult = new MissingParamError('passwordConfirmation')
-
-      // When
-      const error = sut.validate(request.body)
-
-      // Then
-      expect(error).toEqual(expectedResult)
-    })
-
-    it('Should return undefined if field is provided', async () => {
+    it('Should return undefined if required field is provided', async () => {
       // Given
       const sut = createRequiredFieldsValidationInstance('name')
       const request = makeFakeRequest()
