@@ -116,6 +116,18 @@ describe('SignUpValidation Factory', () => {
       // Then
       expect(error).toEqual(expectedResult)
     })
+
+    it('Should return undefined if field is provided', async () => {
+      // Given
+      const sut = createRequiredFieldsValidationInstance('name')
+      const request = makeFakeRequest()
+
+      // When
+      const error = sut.validate(request.body)
+
+      // Then
+      expect(error).toBeUndefined()
+    })
   })
 
   describe('CompareFieldsValidation', () => {
