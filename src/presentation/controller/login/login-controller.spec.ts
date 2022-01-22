@@ -75,10 +75,10 @@ describe('Login Controller', () => {
     await sut.handle(request)
 
     // Then
-    expect(dependencies.auth).toHaveBeenCalledWith(
-      request.body.email,
-      request.body.password
-    )
+    expect(dependencies.auth).toHaveBeenCalledWith({
+      email: request.body.email,
+      password: request.body.password
+    })
   })
 
   it('Should return 401 if invalid credentials are provided', async () => {
