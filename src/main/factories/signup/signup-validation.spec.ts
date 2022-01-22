@@ -1,13 +1,13 @@
 import { makeSignUpValidation } from './signup-validation'
-import { ValidationComposite } from '../../presentation/helpers/validators/validation-composite'
-import { RequiredFieldsValidation } from '../../presentation/helpers/validators/required-fields-validation'
-import { CompareFieldsValidation } from '../../presentation/helpers/validators/compare-fields-validation'
-import { EmailValidation } from '../../presentation/helpers/validators/email-validation'
-import { EmailValidator } from '../../presentation/protocols/email-validator'
-import { HttpRequest } from '../../presentation/protocols'
-import { InvalidParamError, MissingParamError } from '../../presentation/errors'
+import { ValidationComposite } from '../../../presentation/helpers/validators/validation-composite'
+import { RequiredFieldsValidation } from '../../../presentation/helpers/validators/required-fields-validation'
+import { CompareFieldsValidation } from '../../../presentation/helpers/validators/compare-fields-validation'
+import { EmailValidation } from '../../../presentation/helpers/validators/email-validation'
+import { EmailValidator } from '../../../presentation/protocols/email-validator'
+import { HttpRequest } from '../../../presentation/protocols'
+import { InvalidParamError, MissingParamError } from '../../../presentation/errors'
 
-jest.mock('../../presentation/helpers/validators/validation-composite')
+jest.mock('../../../presentation/helpers/validators/validation-composite')
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
