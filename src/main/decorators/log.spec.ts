@@ -1,6 +1,6 @@
 import { LogErrorRepository } from '../../data/protocols/log-error-repository'
 import { SignUpController } from '../../presentation/controller/signup/signup-controller'
-import { internalServerError, success } from '../../presentation/helpers/http-helper'
+import { internalServerError, success } from '../../presentation/helpers/http/http-helper'
 import { HttpRequest } from '../../presentation/protocols'
 import { LogControllerDecorator } from './log'
 

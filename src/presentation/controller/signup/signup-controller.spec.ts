@@ -1,7 +1,7 @@
 import { SignUpController } from './signup-controller'
 import { MissingParamError } from '../../errors'
 import { AddAccount, AccountModel, AddAccountModel, HttpRequest, Validation } from './signup-protocols'
-import { badRequest, internalServerError } from '../../helpers/http-helper'
+import { badRequest, internalServerError } from '../../helpers/http/http-helper'
 
 // ### SUGESTÃO DO MANGUINHO PARA MOCK DO SYSTEM UNDER TEST ###
 const makeValidation = (): Validation => {
