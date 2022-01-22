@@ -32,6 +32,24 @@ const makeFakeRequest = (data?: object): HttpRequest => ({
 })
 
 describe('Login Controller', () => {
+  it('Should call Validation with provided credentials', async () => {
+    // Given
+    const dependencies = {
+      validate: jest.fn()
+    }
+    const sut = makeSut(dependencies)
+    const request = makeFakeRequest()
+
+    // When
+    await sut.handle(request)
+
+    // Then
+    expect(dependencies.validate).toHaveBeenCalledWith({
+      email: request.body.email,
+      password: request.body.password
+    })
+  })
+
   it('Should return 400 if validation fails', async () => {
     // Given
     const sut = makeSut({ validate: jest.fn().mockReturnValue(new MissingParamError('email')) })
