@@ -5,12 +5,14 @@ import {
 import { HashComparer } from '../../protocols/cryptography/hash-comparer'
 import { TokenGenerator } from '../../protocols/cryptography/token-generator'
 import { LoadByAccountRepository } from '../../protocols/db/load-by-account-repository'
+import { UpdateAccessTokenRepository } from '../../protocols/db/update-access-token-repository'
 
 export class DbAuthentication implements Authentication {
   constructor (
     private readonly repository: LoadByAccountRepository,
     private readonly hashComparer: HashComparer,
-    private readonly tokenGenerator: TokenGenerator
+    private readonly tokenGenerator: TokenGenerator,
+    private readonly updateAccessTokenRepo: UpdateAccessTokenRepository
   ) {}
 
   async auth (credentials: AuthenticationModel): Promise<string> {
@@ -24,6 +26,10 @@ export class DbAuthentication implements Authentication {
 
     if (!isValid) return null
 
-    return await this.tokenGenerator.generate(account.id)
+    const token = await this.tokenGenerator.generate(account.id)
+
+    await this.updateAccessTokenRepo.update(account.id, token)
+
+    return token
   }
 }
