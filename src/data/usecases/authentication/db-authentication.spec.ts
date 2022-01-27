@@ -42,4 +42,17 @@ describe('DbAuthentication UseCase', () => {
     // Then
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if LoadAccountByEmailRepository does not find account', async () => {
+    // Given
+    const dependencies = { load: jest.fn().mockResolvedValueOnce(null) }
+    const sut = makeSut(dependencies)
+    const credentials = makeCredentials()
+
+    // When
+    const account = await sut.auth(credentials)
+
+    // Then
+    expect(account).toBe(null)
+  })
 })
