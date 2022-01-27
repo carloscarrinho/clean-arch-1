@@ -178,4 +178,23 @@ describe('DbAuthentication UseCase', () => {
     // Then
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return a token if TokenGenerator succeeds', async () => {
+    // Given
+    const token = 'any_token'
+    const account = makeAccount()
+    const dependencies = {
+      load: jest.fn().mockResolvedValueOnce(account),
+      compare: jest.fn().mockResolvedValueOnce(true),
+      generate: jest.fn().mockResolvedValueOnce(token)
+    }
+    const sut = makeSut(dependencies)
+    const credentials = makeCredentials()
+
+    // When
+    const result = await sut.auth(credentials)
+
+    // Then
+    expect(result).toBe(token)
+  })
 })
