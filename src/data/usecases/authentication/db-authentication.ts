@@ -24,8 +24,6 @@ export class DbAuthentication implements Authentication {
 
     if (!isValid) return null
 
-    await this.tokenGenerator.generate(account.id)
-
-    return null
+    return await this.tokenGenerator.generate(account.id)
   }
 }
