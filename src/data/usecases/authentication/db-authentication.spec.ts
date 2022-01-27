@@ -1,6 +1,6 @@
 import { AuthenticationModel } from '../../../domain/usecases/authentication'
 import { HashComparer } from '../../protocols/cryptography/hash-comparer'
-import { TokenGenerator } from '../../protocols/cryptography/token-generator'
+import { Encrypter } from '../../protocols/cryptography/encrypter'
 import { LoadByAccountRepository } from '../../protocols/db/load-by-account-repository'
 import { UpdateAccessTokenRepository } from '../../protocols/db/update-access-token-repository'
 import { AccountModel } from '../add-account/db-add-account-protocols'
@@ -25,9 +25,9 @@ const makeSut = ({
     compare: compare ?? jest.fn()
   } as unknown as HashComparer
 
-  const tokenGenerator = {
+  const encrypter = {
     generate: generate ?? jest.fn()
-  } as unknown as TokenGenerator
+  } as unknown as Encrypter
 
   const updateAccessTokenRepository = {
     update: update ?? jest.fn()
@@ -36,7 +36,7 @@ const makeSut = ({
   return new DbAuthentication(
     loadAccountByEmailRepository,
     hashComparer,
-    tokenGenerator,
+    encrypter,
     updateAccessTokenRepository
   )
 }
@@ -151,7 +151,7 @@ describe('DbAuthentication UseCase', () => {
     expect(result).toBe(null)
   })
 
-  it('Should call TokenGenerator with received id', async () => {
+  it('Should call Encrypter with received id', async () => {
     // Given
     const account = makeAccount()
     const dependencies = {
@@ -171,7 +171,7 @@ describe('DbAuthentication UseCase', () => {
     )
   })
 
-  it('Should throw an error if TokenGenerator throws', async () => {
+  it('Should throw an error if Encrypter throws', async () => {
     // Given
     const account = makeAccount()
     const dependencies = {
@@ -189,7 +189,7 @@ describe('DbAuthentication UseCase', () => {
     await expect(promise).rejects.toThrow()
   })
 
-  it('Should return a token if TokenGenerator succeeds', async () => {
+  it('Should return a token if Encrypter succeeds', async () => {
     // Given
     const account = makeAccount()
     const dependencies = {
