@@ -29,4 +29,17 @@ describe('DbAuthentication UseCase', () => {
     // Then
     expect(dependencies.load).toHaveBeenCalledWith(credentials.email)
   })
+
+  it('Should throw an error if LoadAccountByEmailRepository throws', async () => {
+    // Given
+    const dependencies = { load: jest.fn().mockImplementationOnce(() => { throw new Error() }) }
+    const sut = makeSut(dependencies)
+    const credentials = makeCredentials()
+
+    // When
+    const promise = sut.auth(credentials)
+
+    // Then
+    await expect(promise).rejects.toThrow()
+  })
 })
