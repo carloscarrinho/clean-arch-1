@@ -112,4 +112,21 @@ describe('DbAuthentication UseCase', () => {
     // Then
     await expect(promise).rejects.toThrow()
   })
+
+  it('Should return null if HashComparer returns false', async () => {
+    // Given
+    const account = makeAccount()
+    const dependencies = {
+      load: jest.fn().mockResolvedValueOnce(account),
+      compare: jest.fn().mockResolvedValueOnce(false)
+    }
+    const sut = makeSut(dependencies)
+    const credentials = makeCredentials()
+
+    // When
+    const result = await sut.auth(credentials)
+
+    // Then
+    expect(result).toBe(null)
+  })
 })
