@@ -160,4 +160,22 @@ describe('DbAuthentication UseCase', () => {
       account.id
     )
   })
+
+  it('Should throw an error if TokenGenerator throws', async () => {
+    // Given
+    const account = makeAccount()
+    const dependencies = {
+      load: jest.fn().mockResolvedValueOnce(account),
+      compare: jest.fn().mockResolvedValueOnce(true),
+      generate: jest.fn().mockImplementationOnce(() => { throw new Error() })
+    }
+    const sut = makeSut(dependencies)
+    const credentials = makeCredentials()
+
+    // When
+    const promise = sut.auth(credentials)
+
+    // Then
+    await expect(promise).rejects.toThrow()
+  })
 })
