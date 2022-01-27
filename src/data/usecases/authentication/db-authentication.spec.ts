@@ -55,6 +55,8 @@ const makeAccount = (data?: object): AccountModel => ({
   ...data
 })
 
+const accessToken = 'any_token'
+
 describe('DbAuthentication UseCase', () => {
   it('Should call LoadAccountByEmailRepository with correct credentials', async () => {
     // Given
@@ -189,12 +191,11 @@ describe('DbAuthentication UseCase', () => {
 
   it('Should return a token if TokenGenerator succeeds', async () => {
     // Given
-    const token = 'any_token'
     const account = makeAccount()
     const dependencies = {
       load: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
-      generate: jest.fn().mockResolvedValueOnce(token)
+      generate: jest.fn().mockResolvedValueOnce(accessToken)
     }
     const sut = makeSut(dependencies)
     const credentials = makeCredentials()
@@ -203,17 +204,16 @@ describe('DbAuthentication UseCase', () => {
     const result = await sut.auth(credentials)
 
     // Then
-    expect(result).toBe(token)
+    expect(result).toBe(accessToken)
   })
 
-  it('Should call TokenGenerator with received id', async () => {
+  it('Should call UpdateAccessTokenRepository with id and token', async () => {
     // Given
-    const token = 'any_token'
     const account = makeAccount()
     const dependencies = {
       load: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
-      generate: jest.fn().mockResolvedValueOnce(token),
+      generate: jest.fn().mockResolvedValueOnce(accessToken),
       update: jest.fn()
     }
     const sut = makeSut(dependencies)
@@ -225,7 +225,26 @@ describe('DbAuthentication UseCase', () => {
     // Then
     expect(dependencies.update).toHaveBeenCalledWith(
       account.id,
-      token
+      accessToken
     )
+  })
+
+  it('Should throw an error if UpdateAccessTokenRepository throws', async () => {
+    // Given
+    const account = makeAccount()
+    const dependencies = {
+      load: jest.fn().mockResolvedValueOnce(account),
+      compare: jest.fn().mockResolvedValueOnce(true),
+      generate: jest.fn().mockResolvedValueOnce(accessToken),
+      update: jest.fn().mockImplementationOnce(() => { throw new Error() })
+    }
+    const sut = makeSut(dependencies)
+    const credentials = makeCredentials()
+
+    // When
+    const promise = sut.auth(credentials)
+
+    // Then
+    await expect(promise).rejects.toThrow()
   })
 })
