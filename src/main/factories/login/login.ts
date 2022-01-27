@@ -10,9 +10,9 @@ import { makeLoginValidation } from './login-validation'
 
 const makeLoginController = (): Controller => {
   const salt = 12
-  const encrypter = new BcryptAdapter(salt)
+  const hasher = new BcryptAdapter(salt)
   const repository = new AccountMongoRepository()
-  const addAccount = new DbAddAccount(encrypter, repository)
+  const addAccount = new DbAddAccount(hasher, repository)
 
   const loginController = new SignUpController(makeLoginValidation(), addAccount)
   const logMongoRepository = new LogMongoRepository()
