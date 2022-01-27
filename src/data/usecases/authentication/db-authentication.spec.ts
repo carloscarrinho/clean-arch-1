@@ -2,17 +2,20 @@ import { AuthenticationModel } from '../../../domain/usecases/authentication'
 import { HashComparer } from '../../protocols/cryptography/hash-comparer'
 import { TokenGenerator } from '../../protocols/cryptography/token-generator'
 import { LoadByAccountRepository } from '../../protocols/db/load-by-account-repository'
+import { UpdateAccessTokenRepository } from '../../protocols/db/update-access-token-repository'
 import { AccountModel } from '../add-account/db-add-account-protocols'
 import { DbAuthentication } from './db-authentication'
 
 const makeSut = ({
   load,
   compare,
-  generate
+  generate,
+  update
 }: {
   load?: Function
   compare?: Function
   generate?: Function
+  update?: Function
 }): DbAuthentication => {
   const loadAccountByEmailRepository = {
     load: load ?? jest.fn()
@@ -26,10 +29,15 @@ const makeSut = ({
     generate: generate ?? jest.fn()
   } as unknown as TokenGenerator
 
+  const updateAccessTokenRepository = {
+    update: update ?? jest.fn()
+  } as unknown as UpdateAccessTokenRepository
+
   return new DbAuthentication(
     loadAccountByEmailRepository,
     hashComparer,
-    tokenGenerator
+    tokenGenerator,
+    updateAccessTokenRepository
   )
 }
 
@@ -196,5 +204,28 @@ describe('DbAuthentication UseCase', () => {
 
     // Then
     expect(result).toBe(token)
+  })
+
+  it('Should call TokenGenerator with received id', async () => {
+    // Given
+    const token = 'any_token'
+    const account = makeAccount()
+    const dependencies = {
+      load: jest.fn().mockResolvedValueOnce(account),
+      compare: jest.fn().mockResolvedValueOnce(true),
+      generate: jest.fn().mockResolvedValueOnce(token),
+      update: jest.fn()
+    }
+    const sut = makeSut(dependencies)
+    const credentials = makeCredentials()
+
+    // When
+    await sut.auth(credentials)
+
+    // Then
+    expect(dependencies.update).toHaveBeenCalledWith(
+      account.id,
+      token
+    )
   })
 })
