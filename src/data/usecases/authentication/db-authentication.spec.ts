@@ -95,4 +95,21 @@ describe('DbAuthentication UseCase', () => {
       account.password
     )
   })
+
+  it('Should throw an error if HashComparer throws', async () => {
+    // Given
+    const account = makeAccount()
+    const dependencies = {
+      load: jest.fn().mockResolvedValueOnce(account),
+      compare: jest.fn().mockImplementationOnce(() => { throw new Error() })
+    }
+    const sut = makeSut(dependencies)
+    const credentials = makeCredentials()
+
+    // When
+    const promise = sut.auth(credentials)
+
+    // Then
+    await expect(promise).rejects.toThrow()
+  })
 })
