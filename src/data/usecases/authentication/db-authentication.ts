@@ -2,8 +2,8 @@ import {
   Authentication,
   AuthenticationModel
 } from '../../../domain/usecases/authentication'
-import { HashComparer } from '../../protocols/hash-comparer'
-import { LoadByAccountRepository } from '../../protocols/load-by-account-repository'
+import { HashComparer } from '../../protocols/cryptography/hash-comparer'
+import { LoadByAccountRepository } from '../../protocols/db/load-by-account-repository'
 
 export class DbAuthentication implements Authentication {
   constructor (
