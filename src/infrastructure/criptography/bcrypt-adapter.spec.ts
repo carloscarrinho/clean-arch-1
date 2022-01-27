@@ -36,6 +36,18 @@ describe('Bcrypt Adapter', () => {
 
       expect(hash).toBe(hashedValue)
     })
+
+    it('Should throw an error if bcrypt.hash throws', async () => {
+      bcrypt.hash = jest.fn().mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
+
+      const sut = makeSut(salt)
+
+      const promise = sut.hash(valueToHash)
+
+      await expect(promise).rejects.toThrow()
+    })
   })
 
   describe('compare', () => {
@@ -60,7 +72,8 @@ describe('Bcrypt Adapter', () => {
     })
 
     it('Should return false if comparation fails', async () => {
-      jest.spyOn(bcrypt, 'compare').mockImplementation(() => false)
+      // jest.spyOn(bcrypt, 'compare').mockImplementation(() => false)
+      bcrypt.compare = jest.fn().mockReturnValueOnce(false)
 
       const parameters = { value: 'any_value', hash: 'any_hash' }
       const sut = makeSut(salt)
@@ -69,17 +82,18 @@ describe('Bcrypt Adapter', () => {
 
       expect(result).toBe(false)
     })
-  })
 
-  it('Should throw an error if bcrypt throws', async () => {
-    bcrypt.hash = jest.fn().mockReturnValueOnce(
-      new Promise((resolve, reject) => reject(new Error()))
-    )
+    it('Should throw an error if bcrypt.compare throws', async () => {
+      bcrypt.compare = jest.fn().mockReturnValueOnce(
+        new Promise((resolve, reject) => reject(new Error()))
+      )
 
-    const sut = makeSut(salt)
+      const parameters = { value: 'any_value', hash: 'any_hash' }
+      const sut = makeSut(salt)
 
-    const promise = sut.hash(valueToHash)
+      const promise = sut.compare(parameters.value, parameters.hash)
 
-    await expect(promise).rejects.toThrow()
+      await expect(promise).rejects.toThrow()
+    })
   })
 })
