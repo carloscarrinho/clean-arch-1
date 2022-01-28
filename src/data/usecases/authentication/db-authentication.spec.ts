@@ -7,18 +7,18 @@ import { AccountModel } from '../add-account/db-add-account-protocols'
 import { DbAuthentication } from './db-authentication'
 
 const makeSut = ({
-  load,
+  loadByEmail,
   compare,
   generate,
   updateAccessToken
 }: {
-  load?: Function
+  loadByEmail?: Function
   compare?: Function
   generate?: Function
   updateAccessToken?: Function
 }): DbAuthentication => {
   const loadAccountByEmailRepository = {
-    load: load ?? jest.fn()
+    loadByEmail: loadByEmail ?? jest.fn()
   } as unknown as LoadByAccountRepository
 
   const hashComparer = {
@@ -60,7 +60,7 @@ const accessToken = 'any_token'
 describe('DbAuthentication UseCase', () => {
   it('Should call LoadAccountByEmailRepository with correct credentials', async () => {
     // Given
-    const dependencies = { load: jest.fn() }
+    const dependencies = { loadByEmail: jest.fn() }
     const sut = makeSut(dependencies)
     const credentials = makeCredentials()
 
@@ -68,12 +68,12 @@ describe('DbAuthentication UseCase', () => {
     await sut.auth(credentials)
 
     // Then
-    expect(dependencies.load).toHaveBeenCalledWith(credentials.email)
+    expect(dependencies.loadByEmail).toHaveBeenCalledWith(credentials.email)
   })
 
   it('Should throw an error if LoadAccountByEmailRepository throws', async () => {
     // Given
-    const dependencies = { load: jest.fn().mockImplementationOnce(() => { throw new Error() }) }
+    const dependencies = { loadByEmail: jest.fn().mockImplementationOnce(() => { throw new Error() }) }
     const sut = makeSut(dependencies)
     const credentials = makeCredentials()
 
@@ -86,7 +86,7 @@ describe('DbAuthentication UseCase', () => {
 
   it('Should return null if LoadAccountByEmailRepository does not find account', async () => {
     // Given
-    const dependencies = { load: jest.fn().mockResolvedValueOnce(null) }
+    const dependencies = { loadByEmail: jest.fn().mockResolvedValueOnce(null) }
     const sut = makeSut(dependencies)
     const credentials = makeCredentials()
 
@@ -101,7 +101,7 @@ describe('DbAuthentication UseCase', () => {
     // Given
     const account = makeAccount()
     const dependencies = {
-      load: jest.fn().mockResolvedValueOnce(account),
+      loadByEmail: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn()
     }
     const sut = makeSut(dependencies)
@@ -121,7 +121,7 @@ describe('DbAuthentication UseCase', () => {
     // Given
     const account = makeAccount()
     const dependencies = {
-      load: jest.fn().mockResolvedValueOnce(account),
+      loadByEmail: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockImplementationOnce(() => { throw new Error() })
     }
     const sut = makeSut(dependencies)
@@ -138,7 +138,7 @@ describe('DbAuthentication UseCase', () => {
     // Given
     const account = makeAccount()
     const dependencies = {
-      load: jest.fn().mockResolvedValueOnce(account),
+      loadByEmail: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(false)
     }
     const sut = makeSut(dependencies)
@@ -155,7 +155,7 @@ describe('DbAuthentication UseCase', () => {
     // Given
     const account = makeAccount()
     const dependencies = {
-      load: jest.fn().mockResolvedValueOnce(account),
+      loadByEmail: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
       generate: jest.fn()
     }
@@ -175,7 +175,7 @@ describe('DbAuthentication UseCase', () => {
     // Given
     const account = makeAccount()
     const dependencies = {
-      load: jest.fn().mockResolvedValueOnce(account),
+      loadByEmail: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
       generate: jest.fn().mockImplementationOnce(() => { throw new Error() })
     }
@@ -193,7 +193,7 @@ describe('DbAuthentication UseCase', () => {
     // Given
     const account = makeAccount()
     const dependencies = {
-      load: jest.fn().mockResolvedValueOnce(account),
+      loadByEmail: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
       generate: jest.fn().mockResolvedValueOnce(accessToken)
     }
@@ -211,7 +211,7 @@ describe('DbAuthentication UseCase', () => {
     // Given
     const account = makeAccount()
     const dependencies = {
-      load: jest.fn().mockResolvedValueOnce(account),
+      loadByEmail: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
       generate: jest.fn().mockResolvedValueOnce(accessToken),
       updateAccessToken: jest.fn()
@@ -233,7 +233,7 @@ describe('DbAuthentication UseCase', () => {
     // Given
     const account = makeAccount()
     const dependencies = {
-      load: jest.fn().mockResolvedValueOnce(account),
+      loadByEmail: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
       generate: jest.fn().mockResolvedValueOnce(accessToken),
       updateAccessToken: jest.fn().mockImplementationOnce(() => { throw new Error() })
