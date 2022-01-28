@@ -4,8 +4,8 @@ import {
 } from '../../../domain/usecases/authentication'
 import { HashComparer } from '../../protocols/cryptography/hash-comparer'
 import { Encrypter } from '../../protocols/cryptography/encrypter'
-import { LoadByAccountRepository } from '../../protocols/db/load-by-account-repository'
-import { UpdateAccessTokenRepository } from '../../protocols/db/update-access-token-repository'
+import { LoadByAccountRepository } from '../../protocols/db/account/load-by-account-repository'
+import { UpdateAccessTokenRepository } from '../../protocols/db/account/update-access-token-repository'
 
 export class DbAuthentication implements Authentication {
   constructor (

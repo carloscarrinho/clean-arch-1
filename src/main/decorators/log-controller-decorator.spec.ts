@@ -1,8 +1,8 @@
-import { LogErrorRepository } from '../../data/protocols/db/log-error-repository'
+import { LogErrorRepository } from '../../data/protocols/db/log/log-error-repository'
 import { SignUpController } from '../../presentation/controller/signup/signup-controller'
 import { internalServerError, success } from '../../presentation/helpers/http/http-helper'
 import { HttpRequest } from '../../presentation/protocols'
-import { LogControllerDecorator } from './log'
+import { LogControllerDecorator } from './log-controller-decorator'
 
 // ###### MEU MOCK ######
 const makeSut = ({

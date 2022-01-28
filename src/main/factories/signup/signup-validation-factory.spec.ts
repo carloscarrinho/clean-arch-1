@@ -1,10 +1,11 @@
+import { makeSignUpValidation } from './signup-validation-factory'
 import { ValidationComposite } from '../../../presentation/helpers/validators/validation-composite'
 import { RequiredFieldsValidation } from '../../../presentation/helpers/validators/required-fields-validation'
+import { CompareFieldsValidation } from '../../../presentation/helpers/validators/compare-fields-validation'
 import { EmailValidation } from '../../../presentation/helpers/validators/email-validation'
 import { EmailValidator } from '../../../presentation/protocols/email-validator'
 import { HttpRequest } from '../../../presentation/protocols'
 import { InvalidParamError, MissingParamError } from '../../../presentation/errors'
-import { makeLoginValidation } from './login-validation'
 
 jest.mock('../../../presentation/helpers/validators/validation-composite')
 
@@ -21,8 +22,10 @@ const makeEmailValidator = (): EmailValidator => {
 const makeFakeRequest = (data?: object): HttpRequest => {
   return {
     body: {
+      name: 'any_name',
       email: 'any_email@mail.com',
       password: 'any_password',
+      passwordConfirmation: 'any_password',
       ...data
     }
   }
@@ -39,12 +42,15 @@ describe('SignUpValidation Factory', () => {
       const emailValidator = makeEmailValidator()
 
       // When
-      makeLoginValidation()
+      makeSignUpValidation()
 
       // Then
       expect(ValidationComposite).toHaveBeenCalledWith([
+        new RequiredFieldsValidation('name'),
         new RequiredFieldsValidation('email'),
         new RequiredFieldsValidation('password'),
+        new RequiredFieldsValidation('passwordConfirmation'),
+        new CompareFieldsValidation('password', 'passwordConfirmation'),
         new EmailValidation('email', emailValidator)
       ])
     })
@@ -65,7 +71,37 @@ describe('SignUpValidation Factory', () => {
 
     it('Should return undefined if required field is provided', async () => {
       // Given
-      const sut = createRequiredFieldsValidationInstance('email')
+      const sut = createRequiredFieldsValidationInstance('name')
+      const request = makeFakeRequest()
+
+      // When
+      const error = sut.validate(request.body)
+
+      // Then
+      expect(error).toBeUndefined()
+    })
+  })
+
+  describe('CompareFieldsValidation', () => {
+    it('Should return invalid param error if password and passwordConfirmation fields do not match', async () => {
+      // Given
+      const sut = new CompareFieldsValidation('password', 'passwordConfirmation')
+      const request = makeFakeRequest({
+        passwordConfirmation: 'different_password'
+      })
+
+      const expectedResult = new InvalidParamError('passwordConfirmation')
+
+      // When
+      const error = sut.validate(request.body)
+
+      // Then
+      expect(error).toEqual(expectedResult)
+    })
+
+    it('Should return undefined if password and passwordConfirmation fields match', async () => {
+      // Given
+      const sut = new CompareFieldsValidation('password', 'passwordConfirmation')
       const request = makeFakeRequest()
 
       // When

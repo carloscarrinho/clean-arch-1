@@ -1,8 +1,8 @@
 import { AuthenticationModel } from '../../../domain/usecases/authentication'
 import { HashComparer } from '../../protocols/cryptography/hash-comparer'
 import { Encrypter } from '../../protocols/cryptography/encrypter'
-import { LoadByAccountRepository } from '../../protocols/db/load-by-account-repository'
-import { UpdateAccessTokenRepository } from '../../protocols/db/update-access-token-repository'
+import { LoadByAccountRepository } from '../../protocols/db/account/load-by-account-repository'
+import { UpdateAccessTokenRepository } from '../../protocols/db/account/update-access-token-repository'
 import { AccountModel } from '../add-account/db-add-account-protocols'
 import { DbAuthentication } from './db-authentication'
 
