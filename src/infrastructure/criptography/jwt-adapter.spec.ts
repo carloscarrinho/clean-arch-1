@@ -35,4 +35,16 @@ describe('Jwt Adapter', () => {
     // Then
     expect(token).toEqual(anyToken)
   })
+
+  it('Should throw an error if jsonwebtoken.sign throws', async () => {
+    // Given
+    jsonwebtoken.sign = jest.fn().mockImplementation(() => { throw new Error() })
+    const sut = makeSut()
+
+    // When
+    const promise = sut.generate(anyValue)
+
+    // Then
+    await expect(promise).rejects.toThrow()
+  })
 })
