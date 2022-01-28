@@ -63,5 +63,16 @@ describe('AccountMongoRepository', () => {
         password: accountData.password
       })
     })
+
+    it('Should return null if loadByEmail fails', async () => {
+      // Given
+      const sut = makeSut()
+
+      // When
+      const account = await sut.loadByEmail('any_email@mail.com')
+
+      // Then
+      expect(account).toBeFalsy()
+    })
   })
 })
