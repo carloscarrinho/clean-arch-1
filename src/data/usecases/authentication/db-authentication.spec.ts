@@ -10,12 +10,12 @@ const makeSut = ({
   load,
   compare,
   generate,
-  update
+  updateAccessToken
 }: {
   load?: Function
   compare?: Function
   generate?: Function
-  update?: Function
+  updateAccessToken?: Function
 }): DbAuthentication => {
   const loadAccountByEmailRepository = {
     load: load ?? jest.fn()
@@ -30,7 +30,7 @@ const makeSut = ({
   } as unknown as Encrypter
 
   const updateAccessTokenRepository = {
-    update: update ?? jest.fn()
+    updateAccessToken: updateAccessToken ?? jest.fn()
   } as unknown as UpdateAccessTokenRepository
 
   return new DbAuthentication(
@@ -214,7 +214,7 @@ describe('DbAuthentication UseCase', () => {
       load: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
       generate: jest.fn().mockResolvedValueOnce(accessToken),
-      update: jest.fn()
+      updateAccessToken: jest.fn()
     }
     const sut = makeSut(dependencies)
     const credentials = makeCredentials()
@@ -223,7 +223,7 @@ describe('DbAuthentication UseCase', () => {
     await sut.auth(credentials)
 
     // Then
-    expect(dependencies.update).toHaveBeenCalledWith(
+    expect(dependencies.updateAccessToken).toHaveBeenCalledWith(
       account.id,
       accessToken
     )
@@ -236,7 +236,7 @@ describe('DbAuthentication UseCase', () => {
       load: jest.fn().mockResolvedValueOnce(account),
       compare: jest.fn().mockResolvedValueOnce(true),
       generate: jest.fn().mockResolvedValueOnce(accessToken),
-      update: jest.fn().mockImplementationOnce(() => { throw new Error() })
+      updateAccessToken: jest.fn().mockImplementationOnce(() => { throw new Error() })
     }
     const sut = makeSut(dependencies)
     const credentials = makeCredentials()
