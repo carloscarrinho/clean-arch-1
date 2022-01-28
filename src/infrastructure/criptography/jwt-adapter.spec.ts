@@ -8,6 +8,7 @@ const makeSut = (): JwtAdapter => {
 }
 
 const anyValue = 'any_value'
+const anyToken = 'any_token'
 const secret = 'secret'
 
 describe('Jwt Adapter', () => {
@@ -21,5 +22,17 @@ describe('Jwt Adapter', () => {
 
     // Then
     expect(signSpy).toHaveBeenCalledWith({ id: anyValue }, secret)
+  })
+
+  it('Should return a token on sign success', async () => {
+    // Given
+    jsonwebtoken.sign = jest.fn().mockReturnValueOnce(anyToken)
+    const sut = makeSut()
+
+    // When
+    const token = await sut.generate(anyValue)
+
+    // Then
+    expect(token).toEqual(anyToken)
   })
 })
