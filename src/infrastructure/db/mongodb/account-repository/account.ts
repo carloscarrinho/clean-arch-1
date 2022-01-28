@@ -20,6 +20,8 @@ export class AccountMongoRepository implements AddAccountRepository, LoadByAccou
     const accountsCollection = await MongoHelper.getCollection('accounts')
     const account = await accountsCollection.findOne({ email })
 
+    if (!account) return null
+
     return {
       id: account._id.toString(),
       name: account.name,
