@@ -38,16 +38,18 @@ describe('Login Routes', () => {
     it('Should return 200 on login', async () => {
       const password = await hash('123456', 12)
 
-      await accountsCollection.insertOne({
+      const account = {
         name: 'Carlos',
         email: 'carlos@mail.com',
         password
-      })
+      }
+
+      await accountsCollection.insertOne(account)
 
       await request(app)
         .post('/api/login')
         .send({
-          email: 'carlos@mail.com',
+          email: account.email,
           password: '123456'
         })
         .expect(200)
@@ -59,6 +61,26 @@ describe('Login Routes', () => {
         .send({
           email: 'any_mail@mail.com',
           password: 'any_password'
+        })
+        .expect(401)
+    })
+
+    it('Should return 401 if credentials are invalid', async () => {
+      const password = await hash('123456', 12)
+
+      const account = {
+        name: 'Carlos',
+        email: 'carlos@mail.com',
+        password
+      }
+
+      await accountsCollection.insertOne(account)
+
+      await request(app)
+        .post('/api/login')
+        .send({
+          email: account.email,
+          password: 'invalid_password'
         })
         .expect(401)
     })
