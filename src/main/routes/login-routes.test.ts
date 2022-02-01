@@ -55,6 +55,15 @@ describe('Login Routes', () => {
         .expect(200)
     })
 
+    it('Should return 400 if e-mail param is missing', async () => {
+      await request(app)
+        .post('/api/login')
+        .send({
+          password: '123456'
+        })
+        .expect(400)
+    })
+
     it('Should return 401 if credentials do not exist', async () => {
       await request(app)
         .post('/api/login')
