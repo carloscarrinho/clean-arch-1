@@ -1,20 +1,22 @@
 import { Request, Response } from 'express'
-import { DbAddAccount } from '../../../data/usecases/add-account/db-add-account'
+import env from '../../config/env'
+import { DbAuthentication } from '../../../data/usecases/authentication/db-authentication'
 import { BcryptAdapter } from '../../../infrastructure/criptography/bcrypt-adapter'
+import { JwtAdapter } from '../../../infrastructure/criptography/jwt-adapter'
 import { AccountMongoRepository } from '../../../infrastructure/db/mongodb/account/account-mongo-repository'
 import { LogMongoRepository } from '../../../infrastructure/db/mongodb/log/log-repository'
-import { SignUpController } from '../../../presentation/controller/signup/signup-controller'
+import { LoginController } from '../../../presentation/controller/login/login-controller'
 import { Controller, HttpRequest, HttpResponse } from '../../../presentation/protocols'
 import { LogControllerDecorator } from '../../decorators/log-controller-decorator'
 import { makeLoginValidation } from './login-validation-factory'
 
 const makeLoginController = (): Controller => {
-  const salt = 12
-  const hasher = new BcryptAdapter(salt)
-  const repository = new AccountMongoRepository()
-  const addAccount = new DbAddAccount(hasher, repository)
+  const accountMongoRepo = new AccountMongoRepository()
+  const hasherComparer = new BcryptAdapter(12)
+  const encrypter = new JwtAdapter(env.secret)
+  const dbAuthentication = new DbAuthentication(accountMongoRepo, hasherComparer, encrypter, accountMongoRepo)
 
-  const loginController = new SignUpController(makeLoginValidation(), addAccount)
+  const loginController = new LoginController(makeLoginValidation(), dbAuthentication)
   const logMongoRepository = new LogMongoRepository()
 
   return new LogControllerDecorator(loginController, logMongoRepository)
